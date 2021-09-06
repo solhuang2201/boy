@@ -23,13 +23,11 @@
             .load( (loader, resources) => {
                 charData = resources;
                 // console.log(resources)
-                init(resources);
+                init();
                 app.start();
             });
 
-        function init(resources) {
-
-            // resources.forEach(function (item) { charData.push(item); });
+        function init() {
 
             const boy_basic01 = new PIXI.spine.Spine(charData.BOY.spineData);
             const boyData = charData.BOY.spineData;
