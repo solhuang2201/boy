@@ -4,14 +4,24 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pixijs-spine</title>
+    <title>pixijs-spine</title><style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
     <script src="js/pixi.js"></script>
     <script src="js/pixi-spine.umd.js"></script>
     <script>
         'use strict'
-        const app = new PIXI.Application();
+        const app = new PIXI.Application({
+            resizeTo: window,
+            autoDensity: true,
+            autoResize: true,
+            resolution: devicePixelRatio
+        });
         document.body.appendChild(app.view);
         let charData = [];
         let newSkin1 = {};
@@ -69,8 +79,14 @@
             skeleton.setSlotsToSetupPose();
 
             // set the position
-            boy_basic01.x = 400;
-            boy_basic01.y = 500;
+            // boy_basic01.x = app.screen.width * 0.5;
+            // boy_basic01.y = app.screen.height * 0.5;
+            boy_basic01.position.set(app.screen.width * 0.5, app.screen.height * 0.5);
+            // 本地容器坐標中的網格
+            // boy_basic01.pivot.x = boy_basic01.width * 0.5;
+            // boy_basic01.pivot.y = boy_basic01.height * 0.5;
+            
+
 
             if (boy_basic01.state.hasAnimation('walk')) {
                 // walk forever, little boy!
@@ -97,6 +113,20 @@
                 skeleton.setSlotsToSetupPose();
                 
             });
+            
+            // Listen for window resize events
+            window.addEventListener('resize', resize);
+
+            function resize() {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+
+                app.renderer.resize(w, h);
+
+                // 將畫面的正中間放在 app.renderer 一半寬高的位置
+                // console.log(app.stage.children)
+                boy_basic01.position.set(app.screen.width * 0.5, app.screen.height * 0.5);
+            };
         };
         
         function makeNewSkin(newSkin, newSkinName, skin, boyData) {
