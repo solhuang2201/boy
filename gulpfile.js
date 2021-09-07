@@ -70,7 +70,7 @@ function watch() {
 
 function sync() {
     // connectPhp.server({base: './public/', port: 3000, keepalive: true}, function () {browserSync.init({proxy: 'localhost:1999',watch: true,open: true,notify: false});});
-    connectPhp.server({ base: 'spine/public', port: 3000, keepalive: true }, function () { browserSync.init({ proxy: 'localhost/spine/public', watch: true, open: true, notify: false }); });
+    connectPhp.server({ base: 'spine_boy/public', port: 3000, keepalive: true }, function () { browserSync.init({ proxy: 'localhost/spine_boy/public', watch: true, open: true, notify: false }); });
 };
 
 // 清除資料夾指令

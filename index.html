@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pixijs-spine</title>
+</head>
+<body>
+    <script src="js/pixi.js"></script>
+    <script src="js/pixi-spine.umd.js"></script>
+    <script>
+        'use strict'
+        const app = new PIXI.Application();
+        document.body.appendChild(app.view);
+        let charData = [];
+        let newSkin1 = {};
+        let newSkin2 = {};
+        let newSkin3 = {};
+        let newSkin4 = {};
+        let skinGroup = [];
+        let n = 0;
+        let executed = false;
+
+        app.loader
+            .add('BOY', 'json/BOY.json')
+            .load( (loader, resources) => {
+                charData = resources;
+                init();
+                app.start();
+            });
+
+        function init() {
+
+            const boy_basic01 = new PIXI.spine.Spine(charData.BOY.spineData);
+            const boyData = charData.BOY.spineData;
+            const skeleton = boy_basic01.skeleton;
+
+            makeNewSkin(newSkin1, 'newSkinCover1', 1, boyData);
+            makeNewSkin(newSkin2, 'newSkinCover2', 2, boyData);
+            makeNewSkin(newSkin3, 'newSkinCover3', 2, boyData);
+            makeNewSkin(newSkin4, 'newSkinCover4', 1, boyData);
+            newSkin3.attachments[25] = charData.BOY.spineData.skins[1].attachments[25]
+            newSkin3.attachments[26] = charData.BOY.spineData.skins[1].attachments[26]
+            newSkin4.attachments[23] = charData.BOY.spineData.skins[2].attachments[23]
+            newSkin4.attachments[24] = charData.BOY.spineData.skins[2].attachments[24]
+            newSkin4.attachments[25] = undefined
+            newSkin4.attachments[26] = undefined
+            // console.log(skinGroup, newSkin3, charData.BOY.spineData, skinGroup[0]);
+
+            boyData.skins.push(newSkin1);
+            boyData.skins.push(newSkin2);
+            boyData.skins.push(newSkin3);
+            boyData.skins.push(newSkin4);
+
+            // add the boy_basic01 to the scene and render...
+            app.stage.addChild(boy_basic01);
+
+            app.stage.interactive = true;
+            app.stage.buttonMode = true;
+
+            // set current skin boy_skin/boy_skin01;
+            function setSkinByName(skinName) {
+                skeleton.setSkin(null);
+                skeleton.setSkinByName(skinName);
+            }
+            
+            setSkinByName('newSkinCover1');
+            skeleton.setSlotsToSetupPose();
+
+            // set the position
+            boy_basic01.x = 400;
+            boy_basic01.y = 500;
+
+            if (boy_basic01.state.hasAnimation('walk')) {
+                // walk forever, little boy!
+                boy_basic01.state.setAnimation(0, 'walk', true);
+                // dont walk too fast
+                boy_basic01.state.timeScale = 1.25;
+            }
+            app.stage.on('pointertap', () => {
+                // change current skin
+                const currentSkinName = skeleton.skin.name;
+
+                // 隨機
+                const skinNameRandom = skinGroup[getRadomNumber(skinGroup.indexOf(currentSkinName), skinGroup.length-1)];
+                // console.log(currentSkinName == skinNameRandom, skinGroup.indexOf(currentSkinName));
+                setSkinByName(skinNameRandom);
+
+                // 依序
+                // firstClick();
+                // // console.log(n, executed);
+                // setSkinByName(skinGroup[n]);
+                // n++
+                // if (n >= skinGroup.length) { return n = 0 }
+
+                skeleton.setSlotsToSetupPose();
+                
+            });
+        };
+        
+        function makeNewSkin(newSkin, newSkinName, skin, boyData) {
+            let newSkinAtt = [];
+            for (var item in boyData.skins[skin]) {
+                newSkin[item] = boyData.skins[skin][item];
+            }
+            for (var item in boyData.skins[skin].attachments) {
+                newSkinAtt[item] = boyData.skins[skin].attachments[item]
+            }
+            newSkin.attachments = newSkinAtt;
+            for (var item in boyData.skins[0].attachments) {
+                newSkin.attachments[item] = boyData.skins[0].attachments[item]
+            }
+            newSkin.name = newSkinName;
+            skinGroup.push(newSkinName);
+            return newSkin, skinGroup
+        };
+
+        function firstClick() {
+            if(! executed) {
+                executed = true;
+                n++
+            }
+        };
+
+        function getRadomNumber(orign,max) {
+            let result = Math.floor(Math.random() * max);
+            if (result == orign) 
+                if (result == max) result -= 1
+                else result += 1
+            return result;
+        };
+
+    </script>
+</body>
+</html>  
