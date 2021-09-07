@@ -16,13 +16,16 @@
         let charData = [];
         let newSkin1 = {};
         let newSkin2 = {};
-        // let newSkin1Att = [];
-        // let newSkin2Att = [];
+        let newSkin3 = {};
+        let newSkin4 = {};
+        let skinGroup = [];
+        let n = 0;
+        let executed = false;
+
         app.loader
             .add('BOY', 'json/BOY.json')
             .load( (loader, resources) => {
                 charData = resources;
-                // console.log(resources)
                 init();
                 app.start();
             });
@@ -35,9 +38,20 @@
 
             makeNewSkin(newSkin1, 'newSkinCover1', 1, boyData);
             makeNewSkin(newSkin2, 'newSkinCover2', 2, boyData);
+            makeNewSkin(newSkin3, 'newSkinCover3', 2, boyData);
+            makeNewSkin(newSkin4, 'newSkinCover4', 1, boyData);
+            newSkin3.attachments[25] = charData.BOY.spineData.skins[1].attachments[25]
+            newSkin3.attachments[26] = charData.BOY.spineData.skins[1].attachments[26]
+            newSkin4.attachments[23] = charData.BOY.spineData.skins[2].attachments[23]
+            newSkin4.attachments[24] = charData.BOY.spineData.skins[2].attachments[24]
+            newSkin4.attachments[25] = undefined
+            newSkin4.attachments[26] = undefined
+            // console.log(skinGroup, newSkin3, charData.BOY.spineData, skinGroup[0]);
 
             boyData.skins.push(newSkin1);
             boyData.skins.push(newSkin2);
+            boyData.skins.push(newSkin3);
+            boyData.skins.push(newSkin4);
 
             // add the boy_basic01 to the scene and render...
             app.stage.addChild(boy_basic01);
@@ -62,14 +76,26 @@
                 // walk forever, little boy!
                 boy_basic01.state.setAnimation(0, 'walk', true);
                 // dont walk too fast
-                boy_basic01.state.timeScale = 1;
+                boy_basic01.state.timeScale = 1.25;
             }
-
             app.stage.on('pointertap', () => {
                 // change current skin
                 const currentSkinName = skeleton.skin.name;
-                setSkinByName(currentSkinName === 'newSkinCover1' ? 'newSkinCover2' : 'newSkinCover1');
+
+                // 隨機
+                const skinNameRandom = skinGroup[getRadomNumber(skinGroup.indexOf(currentSkinName), skinGroup.length-1)];
+                // console.log(currentSkinName == skinNameRandom, skinGroup.indexOf(currentSkinName));
+                setSkinByName(skinNameRandom);
+
+                // 依序
+                // firstClick();
+                // // console.log(n, executed);
+                // setSkinByName(skinGroup[n]);
+                // n++
+                // if (n >= skinGroup.length) { return n = 0 }
+
                 skeleton.setSlotsToSetupPose();
+                
             });
         };
         
@@ -86,8 +112,25 @@
                 newSkin.attachments[item] = boyData.skins[0].attachments[item]
             }
             newSkin.name = newSkinName;
-            return newSkin
+            skinGroup.push(newSkinName);
+            return newSkin, skinGroup
         };
+
+        function firstClick() {
+            if(! executed) {
+                executed = true;
+                n++
+            }
+        };
+
+        function getRadomNumber(orign,max) {
+            let result = Math.floor(Math.random() * max);
+            if (result == orign) 
+                if (result == max) result -= 1
+                else result += 1
+            return result;
+        };
+
     </script>
 </body>
 </html>  
